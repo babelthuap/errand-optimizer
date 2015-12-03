@@ -1,0 +1,27 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#map {
+  height: 100%;
+}
+
+#search {
+  z-index: 9999;
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.5);
+}
+
+#address, #go {
+  padding: 5px;
+}
+
+#go {
+  font-size: 100%;
+}
