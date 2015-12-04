@@ -3,6 +3,7 @@ var map;
 $(document).ready(function() {
 
   var NUM_DESTINATIONS = $('.destination').length;
+  var OVER_QUERY_LIMIT = false;
   var travelTimes;
 
   var geocodeUrl = 'https://maps.googleapis.com/maps/api/geocode/json?';
@@ -44,6 +45,8 @@ $(document).ready(function() {
   function findOptimal() {
     if (!home) return;
 
+    $('#findOptimal').prop('disabled', true)
+
     // create array of the destinations
     var dests = [];
     for (var i = 0; i < NUM_DESTINATIONS; i++) {
@@ -54,35 +57,79 @@ $(document).ready(function() {
     }
 
     // we won't calculate an optimal route for 0 or 1 destinations 
-    if (dests.length < 2) return;
+    if (dests.length < 2) {
+      $('#findOptimal').prop('disabled', false);
+      return;
+    }
 
     // make array of all pairs of nodes (including home)
     var pairs = allPairs(dests.concat([home]));
 
-    // make array of all permutations of the destinations
-    var perms = allPerms(dests);
+    // make array of all permutations of the nodes (a.k.a. destinations)
+    // -- these represent all possible routes that visit all nodes (and start and end at home)
+    var routes = allPerms(dests).map(function(route) {
+      return [home].concat(route).concat([home]);
+    })
+
 
     console.log('dests:', dests);
     console.log('pairs:', pairs);
-    console.log('perms:', perms);
+    console.log('routes:', routes);
+
+    // to ensure we don't hit the query limit, spread out the queries
+    var interval = 0;
+    if (pairs.length > 6) interval = 200;
+    if (pairs.length > 12) interval = 600;
 
     // get travel time between each pair of destinations
     travelTimes = {};
-    pairs.forEach(function(pair) {
-      calcTimeBetween(pair[0], pair[1]);
+    pairs.forEach(function(pair, i) {
+      // stagger queries
+      setTimeout(function() {
+        calcTimeBetween(pair[0], pair[1]);
+      }, i * interval)
     });
 
+    var i = 0;
     var waitToGetAllTimes = setInterval(function() {
+      console.log(++i);
+
+      if (OVER_QUERY_LIMIT) {
+        clearInterval(waitToGetAllTimes);
+        alert('OVER QUERY LIMIT (try again in a few seconds)');
+        OVER_QUERY_LIMIT = false;
+        $('#findOptimal').prop('disabled', false);
+      }
+
       if (Object.keys(travelTimes).length === pairs.length) {
         clearInterval(waitToGetAllTimes);
         console.log('travelTimes:', travelTimes);
+
+        // calculate time for each route        
+        var totalTimes = routes.map(totalTimeOfRoute);
+        console.log('totalTimes:', totalTimes);
+
+        // pick out fastest route
+        var indexOfFastest = totalTimes.reduce(function(iOfMin, current, i) {
+          return current < totalTimes[iOfMin] ? i : iOfMin;
+        }, 0);
+
+        console.log('indexOfFastest:', indexOfFastest);
+        console.log('fastestRoute:', routes[indexOfFastest], totalTimeOfRoute(routes[indexOfFastest]));
+
+
+
+        $('#findOptimal').prop('disabled', false);
       }
-    }, 25);
+    }, interval + 10);
+  }
 
 
-
-
-    // calcTimeBetween($('#loc1').val(), $('#loc2').val());
+  function totalTimeOfRoute(route) {
+    return route.reduce(function(total, dest, i) {
+      if (i === route.length - 1) return total;
+      return total + travelTimes[dest + '->' + route[i + 1]];
+    }, 0);
   }
 
 
@@ -128,15 +175,16 @@ $(document).ready(function() {
     };
 
     directionsService.route(request, function(data, status) {
+      // console.log(loc1, loc2, data);
+
       if (status == google.maps.DirectionsStatus.OK) {
         var time = data.routes[0].legs[0].duration.value;
         travelTimes[loc1 + '->' + loc2] = time;
+      } else {
+        OVER_QUERY_LIMIT = true;
       }
     });
-
-
   }
-
 
 })
 
