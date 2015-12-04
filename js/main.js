@@ -5,7 +5,6 @@ $(document).ready(function() {
   console.log('jQuery working')
   
   var geocodeUrl = 'https://maps.googleapis.com/maps/api/geocode/json?';
-  var directionsUrl = 'https://maps.googleapis.com/maps/api/directions/json?';
   var apiKey = 'AIzaSyBNRDTGtLXHjQHOGmXviTCtmLSw2Qn6SPU';
 
   $('#go').click(centerOnAddress);
@@ -16,20 +15,24 @@ $(document).ready(function() {
   $('#CALC').click(calcTime);
 
   function calcTime() {
-    var loc1 = $('#loc1').val().replace(/\s+/g, '+');
-    var loc2 = $('#loc2').val().replace(/\s+/g, '+');
+    var directionsService = new google.maps.DirectionsService();
 
-    $.get(directionsUrl + 'key=' + apiKey + '&origin=' + loc1 + '&destination=' + loc2)
-    .done(function(data) {
-      console.log('directions:', data);
+    var request = {
+      origin: $('#loc1').val(),
+      destination: $('#loc2').val(),
+      travelMode: google.maps.TravelMode.DRIVING
+    };
 
-      $('#time').text( data.routes[0].legs.duration.value );
-    })
+    directionsService.route(request, function(data, status) {
+      if (status == google.maps.DirectionsStatus.OK) {
+        console.log('data:', data);
+        $('#time').text( data.routes[0].legs[0].duration.value );
+      }
+    });
   }
 
 
-
-
+  
 
 
   function centerOnAddress() {
