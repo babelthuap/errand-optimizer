@@ -137,7 +137,7 @@ $(document).ready(function() {
 
         $('#findOptimal').prop('disabled', false);
       }
-    }, 100);
+    }, 250);
 
   }
 
