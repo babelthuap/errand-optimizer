@@ -72,7 +72,7 @@ $(document).ready(function() {
     }
 
     // let the user that the program is working
-    $('#results .caption').text('Be patient! This takes a few seconds.');
+    $('#results .caption').text('Be patient! It takes a few seconds to resolve all the Google Maps queries.');
     $('#results ol, #results a').empty();
 
     // make array of all pairs of nodes (including home)
