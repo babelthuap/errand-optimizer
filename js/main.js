@@ -14,12 +14,16 @@ $(document).ready(function() {
 
   // get current location
   var home;
+  $('button').prop('disabled', true);
+  $('#results .caption').text('Getting your current location...');
   navigator.geolocation.getCurrentPosition(function(pos) {
     home = pos.coords.latitude.toFixed(7) + ',' + pos.coords.longitude.toFixed(7);
     console.log('home:', home);
+    $('button').prop('disabled', false);
+    $('#results .caption').empty();
   });
 
-  $('.center').click(centerOnAddress);
+  $('.find').click(centerOnAddress);
   $('#findOptimal').click(findOptimal);
 
   function centerOnAddress() {
@@ -62,6 +66,10 @@ $(document).ready(function() {
       return;
     }
 
+    // let the user that the program is working
+    $('#results .caption').text('Be patient! This takes a few seconds.');
+    $('#results ol, #results a').empty();
+
     // make array of all pairs of nodes (including home)
     var pairs = allPairs(dests.concat([home]));
 
@@ -78,13 +86,13 @@ $(document).ready(function() {
 
     // to ensure we don't hit the query limit, spread out the queries
     var interval = 0;
-    if (pairs.length > 6) interval = 200;
-    if (pairs.length > 12) interval = 600;
+    if (pairs.length > 6) interval += 200;
+    if (pairs.length > 12) interval += 400;
 
     // get travel time between each pair of destinations
     travelTimes = {};
     pairs.forEach(function(pair, i) {
-      // stagger queries
+      // stagger queries -- THIS IS A SILLY KLUDGE
       setTimeout(function() {
         calcTimeBetween(pair[0], pair[1]);
       }, i * interval)
@@ -117,11 +125,33 @@ $(document).ready(function() {
         console.log('indexOfFastest:', indexOfFastest);
         console.log('fastestRoute:', routes[indexOfFastest], totalTimeOfRoute(routes[indexOfFastest]));
 
+        
+        // display the results
+        $('#results .caption').text('Fastest Route (' +
+                                    Math.round(totalTimes[indexOfFastest] / 60) +
+                                    ' minutes total):');
 
+        var $directions = [];
+        routes[indexOfFastest].forEach(function(dest, i, arr) {
+          if (i === 0 || i === arr.length - 1) dest = 'Your current Location';
+          $directions.push( $('<li>').text(dest) );
+        });
+
+        $('#results ol').append($directions);
+
+        var directionsUrl = 'https://www.google.com/maps/dir/'
+        routes[indexOfFastest].forEach(function(dest) {
+          directionsUrl += dest.replace(/\s+/g, '+') + '/';
+        });
+
+        $('#results ol').after( $('<a>').text('view directions in Google Maps')
+                                        .attr('href', directionsUrl)
+                                        .attr('target', '_blank') );        
 
         $('#findOptimal').prop('disabled', false);
       }
     }, interval + 10);
+
   }
 
 

@@ -8,6 +8,15 @@ html, body {
   height: 100%;
 }
 
+a {
+  color: white;
+  font-style: italic;
+}
+
+a:hover {
+  color: red;
+}
+
 #search {
   color: white;
   z-index: 9999;
@@ -29,4 +38,10 @@ html, body {
 
 .destination {
   margin-bottom: 5px;
+}
+
+.byline {
+  font-style: italic;
+  margin-top: -10px;
+  margin-bottom: 10px;
 }
