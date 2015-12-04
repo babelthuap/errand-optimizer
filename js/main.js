@@ -42,7 +42,7 @@ $(document).ready(function() {
 
   // THIS IS A BRUTE FORCE SOLUTION OF THE TRAVELING SALESMAN PROBLEM
   function findOptimal() {
-    console.log('findOptimal');
+    if (!home) return;
 
     // create array of the destinations
     var dests = [];
@@ -56,11 +56,13 @@ $(document).ready(function() {
     // we won't calculate an optimal route with 0 or 1 destinations 
     if (dests.length < 2) return;
 
-    console.log('dests:', dests);
+    // make array of all pairs of nodes (including home)
+    var pairs = allPairs(dests.concat([home]));
 
-    var pairs = allPairs(dests);
+    // make array of all permutations of the destinations
     var perms = allPerms(dests);
 
+    console.log('dests:', dests);
     console.log('pairs:', pairs);
     console.log('perms:', perms);
 
