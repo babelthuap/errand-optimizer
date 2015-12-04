@@ -3,7 +3,7 @@ var map;
 $(document).ready(function() {
 
   var NUM_DESTINATIONS = $('.destination').length;
-  var OVER_QUERY_LIMIT = false;
+  var BAD_QUERY = false;
   var travelTimes;
 
   var geocodeUrl = 'https://maps.googleapis.com/maps/api/geocode/json?';
@@ -70,8 +70,7 @@ $(document).ready(function() {
       return;
     }
 
-    // let the user that the program is working
-    $('#results .caption').text('Be patient! It takes a few seconds to resolve all the Google Maps queries.');
+    // clear old results
     $('#results ol, #results a').empty();
 
     // make array of all pairs of nodes (including home)
@@ -83,28 +82,25 @@ $(document).ready(function() {
       return [home].concat(route).concat([home]);
     })
 
-    // to ensure we don't hit the query limit, spread out the queries
-    var interval = 0;
-    if (pairs.length > 6) interval += 200;
-    if (pairs.length > 12) interval += 400;
-
     // get travel time between each pair of destinations
     travelTimes = {};
     pairs.forEach(function(pair, i) {
-      // stagger queries -- THIS IS A SILLY KLUDGE TO AVOID THE QUERY LIMIT
-      setTimeout(function() {
-        calcTimeBetween(pair[0], pair[1]);
-      }, i * interval)
+      calcTimeBetween(pair[0], pair[1]);
     });
 
     var waitToGetAllTimes = setInterval(function() {
 
-      if (OVER_QUERY_LIMIT) {
+      if (BAD_QUERY) {
         clearInterval(waitToGetAllTimes);
         alert('There was a problem resolving some of the Google Maps queries. Make sure all addresses are valid.');
-        OVER_QUERY_LIMIT = false;
+        BAD_QUERY = false;
         $('#findOptimal').prop('disabled', false);
       }
+
+      $('#results .caption').text('Queries resolved: ' + 
+                                  Object.keys(travelTimes).length +
+                                  ' of ' +
+                                  pairs.length);
 
       if (Object.keys(travelTimes).length === pairs.length) {
         clearInterval(waitToGetAllTimes);
@@ -141,7 +137,7 @@ $(document).ready(function() {
 
         $('#findOptimal').prop('disabled', false);
       }
-    }, interval + 10);
+    }, 100);
 
   }
 
@@ -199,8 +195,12 @@ $(document).ready(function() {
       if (status == google.maps.DirectionsStatus.OK) {
         var time = data.routes[0].legs[0].duration.value;
         travelTimes[loc1 + '->' + loc2] = time;
+      } else if (status === 'OVER_QUERY_LIMIT' && !BAD_QUERY) {
+        setTimeout(function() {
+          calcTimeBetween(loc1, loc2);
+        }, 250 + Math.floor(Math.random() * 750)); // wait 250+ ms before trying again
       } else {
-        OVER_QUERY_LIMIT = true;
+        BAD_QUERY = true;
       }
     });
   }
