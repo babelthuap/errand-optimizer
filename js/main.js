@@ -3,21 +3,30 @@ var map;
 $(document).ready(function() {
 
   var NUM_DESTINATIONS = $('.destination').length;
+  var travelTimes;
+
+  var geocodeUrl = 'https://maps.googleapis.com/maps/api/geocode/json?';
+  var apiKey = 'AIzaSyBKpcPHdC40SqI-bQoThXGU1YTKW3Xg-oY';
 
   // FOR TESTING PURPOSES
-  var HOME = '46684 Windmill Dr';
-  
-  var geocodeUrl = 'https://maps.googleapis.com/maps/api/geocode/json?';
-  var apiKey = 'AIzaSyAkiQd6LbsShOKAG8vrR-YMF9dn3BQE9oE';
+  // var HOME = '46684 Windmill Dr';
 
+  // get current location
+  var home;
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    home = pos.coords.latitude.toFixed(7) + ',' + pos.coords.longitude.toFixed(7);
+    console.log('home:', home);
+  });
 
   $('.center').click(centerOnAddress);
   $('#findOptimal').click(findOptimal);
 
   function centerOnAddress() {
     var address = $(this).siblings('.address').val().replace(/\s+/g, '+');
+
     $.get(geocodeUrl + 'key=' + apiKey + '&address=' + address)
       .done(function(data) {
+        console.log('data:', data);
         if (data.results.length === 0) return; // if it found no matches
         var location = data.results[0].geometry.location;
         map = new google.maps.Map(document.getElementById('map'), {
@@ -49,20 +58,52 @@ $(document).ready(function() {
 
     console.log('dests:', dests);
 
-    // create array of all pairs of destinations (order matters)
-    var pairs = [];
-    for (var i = 0; i < dests.length - 1; i++) {
-      for (var j = i + 1; j < dests.length; j++) {
-        pairs.push([ dests[i], dests[j] ]);
-        pairs.push([ dests[j], dests[i] ]);
-      }
-    }
+    var pairs = allPairs(dests);
+    var perms = allPerms(dests);
 
-    console.log('pairs:', pairs)
+    console.log('pairs:', pairs);
+    console.log('perms:', perms);
+
+    // get travel time between each pair of destinations
+    // travelTimes = {};
+    // pairs.forEach(function(pair) {
+    //   calcTimeBetween(pair[0], pair[1]);
+    // });
+
+
 
 
 
     // calcTimeBetween($('#loc1').val(), $('#loc2').val());
+  }
+
+
+  // generate all length-2 subsets of an array (order matters)
+  function allPairs(arr) {
+    var pairs = [];
+    for (var i = 0; i < arr.length - 1; i++) {
+      for (var j = i + 1; j < arr.length; j++) {
+        pairs.push([ arr[i], arr[j] ]);
+        pairs.push([ arr[j], arr[i] ]);
+      }
+    }
+    return pairs;
+  }
+
+  // generate all permutations of an array
+  function allPerms(arr) {
+    if (arr.length === 1) return [arr];
+    var perms = [];
+    for (var i = 0; i < arr.length; i++) {
+      var elem = [arr[i]];
+      var permsOnElem = [];
+      var rest = arr.slice(0, i).concat(arr.slice(i + 1));
+      allPerms(rest).forEach(function(perm) {
+        permsOnElem.push( elem.concat(perm) );
+      });
+      perms = perms.concat(permsOnElem);
+    }
+    return perms;
   }
 
 
@@ -83,6 +124,7 @@ $(document).ready(function() {
       }
     });
   }
+
 
 })
 
