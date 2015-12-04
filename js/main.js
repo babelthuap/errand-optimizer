@@ -101,7 +101,7 @@ $(document).ready(function() {
 
       if (OVER_QUERY_LIMIT) {
         clearInterval(waitToGetAllTimes);
-        alert('OVER QUERY LIMIT (try again in a few seconds)');
+        alert('There was a problem resolving some of the Google Maps queries. Make sure all addresses are valid.');
         OVER_QUERY_LIMIT = false;
         $('#findOptimal').prop('disabled', false);
       }
