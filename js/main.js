@@ -53,7 +53,7 @@ $(document).ready(function() {
       }
     }
 
-    // we won't calculate an optimal route with 0 or 1 destinations 
+    // we won't calculate an optimal route for 0 or 1 destinations 
     if (dests.length < 2) return;
 
     // make array of all pairs of nodes (including home)
@@ -67,11 +67,17 @@ $(document).ready(function() {
     console.log('perms:', perms);
 
     // get travel time between each pair of destinations
-    // travelTimes = {};
-    // pairs.forEach(function(pair) {
-    //   calcTimeBetween(pair[0], pair[1]);
-    // });
+    travelTimes = {};
+    pairs.forEach(function(pair) {
+      calcTimeBetween(pair[0], pair[1]);
+    });
 
+    var waitToGetAllTimes = setInterval(function() {
+      if (Object.keys(travelTimes).length === pairs.length) {
+        clearInterval(waitToGetAllTimes);
+        console.log('travelTimes:', travelTimes);
+      }
+    }, 25);
 
 
 
@@ -95,6 +101,7 @@ $(document).ready(function() {
   // generate all permutations of an array
   function allPerms(arr) {
     if (arr.length === 1) return [arr];
+
     var perms = [];
     for (var i = 0; i < arr.length; i++) {
       var elem = [arr[i]];
@@ -105,6 +112,7 @@ $(document).ready(function() {
       });
       perms = perms.concat(permsOnElem);
     }
+
     return perms;
   }
 
@@ -122,9 +130,11 @@ $(document).ready(function() {
     directionsService.route(request, function(data, status) {
       if (status == google.maps.DirectionsStatus.OK) {
         var time = data.routes[0].legs[0].duration.value;
-        console.log('time between', loc1, 'and', loc2, '=', time);
+        travelTimes[loc1 + '->' + loc2] = time;
       }
     });
+
+
   }
 
 
