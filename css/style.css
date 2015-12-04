@@ -23,6 +23,7 @@ a:hover {
   position: fixed;
   top: 8px;
   right: 8px;
+  width: 347px;
   padding: 12px;
   border-radius: 8px;
   background: rgba(0,0,0,0.75);
@@ -43,5 +44,4 @@ a:hover {
 .byline {
   font-style: italic;
   margin-top: -10px;
-  margin-bottom: 10px;
 }

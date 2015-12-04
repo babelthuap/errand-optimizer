@@ -9,20 +9,25 @@ $(document).ready(function() {
   var geocodeUrl = 'https://maps.googleapis.com/maps/api/geocode/json?';
   var apiKey = 'AIzaSyBKpcPHdC40SqI-bQoThXGU1YTKW3Xg-oY';
 
-  // FOR TESTING PURPOSES
-  // var HOME = '46684 Windmill Dr';
-
   // get current location
   var home;
   $('button').prop('disabled', true);
   $('#results .caption').text('Getting your current location...');
   navigator.geolocation.getCurrentPosition(function(pos) {
-    home = pos.coords.latitude.toFixed(7) + ',' + pos.coords.longitude.toFixed(7);
-    console.log('home:', home);
+    var crd = pos.coords;
+    home = crd.latitude.toFixed(7) + ',' + crd.longitude.toFixed(7);
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: {
+        lat: crd.latitude,
+        lng: crd.longitude
+      },
+      zoom: 12
+    });
     $('button').prop('disabled', false);
     $('#results .caption').empty();
   });
 
+  // click listeners
   $('.find').click(centerOnAddress);
   $('#findOptimal').click(findOptimal);
 
@@ -31,7 +36,7 @@ $(document).ready(function() {
 
     $.get(geocodeUrl + 'key=' + apiKey + '&address=' + address)
       .done(function(data) {
-        console.log('data:', data);
+        // console.log('data:', data);
         if (data.results.length === 0) return; // if it found no matches
         var location = data.results[0].geometry.location;
         map = new google.maps.Map(document.getElementById('map'), {
@@ -79,11 +84,6 @@ $(document).ready(function() {
       return [home].concat(route).concat([home]);
     })
 
-
-    console.log('dests:', dests);
-    console.log('pairs:', pairs);
-    console.log('routes:', routes);
-
     // to ensure we don't hit the query limit, spread out the queries
     var interval = 0;
     if (pairs.length > 6) interval += 200;
@@ -98,9 +98,7 @@ $(document).ready(function() {
       }, i * interval)
     });
 
-    var i = 0;
     var waitToGetAllTimes = setInterval(function() {
-      console.log(++i);
 
       if (OVER_QUERY_LIMIT) {
         clearInterval(waitToGetAllTimes);
@@ -111,19 +109,19 @@ $(document).ready(function() {
 
       if (Object.keys(travelTimes).length === pairs.length) {
         clearInterval(waitToGetAllTimes);
-        console.log('travelTimes:', travelTimes);
+        // console.log('travelTimes:', travelTimes);
 
         // calculate time for each route        
         var totalTimes = routes.map(totalTimeOfRoute);
-        console.log('totalTimes:', totalTimes);
+        // console.log('totalTimes:', totalTimes);
 
         // pick out fastest route
         var indexOfFastest = totalTimes.reduce(function(iOfMin, current, i) {
           return current < totalTimes[iOfMin] ? i : iOfMin;
         }, 0);
 
-        console.log('indexOfFastest:', indexOfFastest);
-        console.log('fastestRoute:', routes[indexOfFastest], totalTimeOfRoute(routes[indexOfFastest]));
+        // console.log('indexOfFastest:', indexOfFastest);
+        // console.log('fastestRoute:', routes[indexOfFastest], totalTimeOfRoute(routes[indexOfFastest]));
 
         
         // display the results
@@ -133,7 +131,7 @@ $(document).ready(function() {
 
         var $directions = [];
         routes[indexOfFastest].forEach(function(dest, i, arr) {
-          if (i === 0 || i === arr.length - 1) dest = 'Your current Location';
+          if (i === 0 || i === arr.length - 1) dest = 'Your current location';
           $directions.push( $('<li>').text(dest) );
         });
 
