@@ -36,7 +36,6 @@ $(document).ready(function() {
 
     $.get(geocodeUrl + 'key=' + apiKey + '&address=' + address)
       .done(function(data) {
-        // console.log('data:', data);
         if (data.results.length === 0) return; // if it found no matches
         var location = data.results[0].geometry.location;
         map = new google.maps.Map(document.getElementById('map'), {
@@ -61,7 +60,7 @@ $(document).ready(function() {
     for (var i = 0; i < NUM_DESTINATIONS; i++) {
       var loc = $('#loc' + i).val();
       if (loc) { // don't bother with empty destinations
-        dests.push( loc );
+        dests.push(loc);
       }
     }
 
@@ -92,7 +91,7 @@ $(document).ready(function() {
     // get travel time between each pair of destinations
     travelTimes = {};
     pairs.forEach(function(pair, i) {
-      // stagger queries -- THIS IS A SILLY KLUDGE
+      // stagger queries -- THIS IS A SILLY KLUDGE TO AVOID THE QUERY LIMIT
       setTimeout(function() {
         calcTimeBetween(pair[0], pair[1]);
       }, i * interval)
@@ -109,21 +108,15 @@ $(document).ready(function() {
 
       if (Object.keys(travelTimes).length === pairs.length) {
         clearInterval(waitToGetAllTimes);
-        // console.log('travelTimes:', travelTimes);
 
         // calculate time for each route        
         var totalTimes = routes.map(totalTimeOfRoute);
-        // console.log('totalTimes:', totalTimes);
 
         // pick out fastest route
         var indexOfFastest = totalTimes.reduce(function(iOfMin, current, i) {
           return current < totalTimes[iOfMin] ? i : iOfMin;
         }, 0);
 
-        // console.log('indexOfFastest:', indexOfFastest);
-        // console.log('fastestRoute:', routes[indexOfFastest], totalTimeOfRoute(routes[indexOfFastest]));
-
-        
         // display the results
         $('#results .caption').text('Fastest Route (' +
                                     Math.round(totalTimes[indexOfFastest] / 60) +
@@ -203,8 +196,6 @@ $(document).ready(function() {
     };
 
     directionsService.route(request, function(data, status) {
-      // console.log(loc1, loc2, data);
-
       if (status == google.maps.DirectionsStatus.OK) {
         var time = data.routes[0].legs[0].duration.value;
         travelTimes[loc1 + '->' + loc2] = time;
@@ -216,44 +207,4 @@ $(document).ready(function() {
 
 })
 
-function initMap() {
-  // CENTER ON USER'S LOCATION:
-  // navigator.geolocation.getCurrentPosition(function(pos) {
-  //   var crd = pos.coords;
-  //   map = new google.maps.Map(document.getElementById('map'), {
-  //     center: {
-  //       lat: crd.latitude,
-  //       lng: crd.longitude
-  //     },
-  //     zoom: 12
-  //   });
-  // });
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function initMap() {}
