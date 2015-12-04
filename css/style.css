@@ -9,19 +9,24 @@ html, body {
 }
 
 #search {
+  color: white;
   z-index: 9999;
   position: fixed;
   top: 8px;
   right: 8px;
   padding: 12px;
   border-radius: 8px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.75);
 }
 
-#address, #go {
-  padding: 5px;
+.address, .go {
+  padding: 2px;
 }
 
-#go {
+.go {
   font-size: 100%;
+}
+
+.destination {
+  margin-bottom: 5px;
 }

@@ -6,24 +6,33 @@
   </head>
   <body>
 
-    <div id="calcTime">
-      <p>Travel time between</p>
-      <input type="text" id="loc1">
-      <p>and</p>
-      <input type="text" id="loc2">
-      <p><button id="CALC">Calculate</button></p>
-      <p id="time"></p>
-    </div>
-
     <div id="search">
-      <input type="text" id="address" placeholder="address" size="64">
-      <button id="go">Center Here</button>
+      <h1>Errand Destinations:</h1>
+      
+      <div class="destination">
+        <input type="text" class="address" id="loc0" value="a" placeholder="address" size="48">
+        <button class="center">Center Here</button>
+      </div>
+      <div class="destination">
+        <input type="text" class="address" id="loc1" value="b" placeholder="address" size="48">
+        <button class="center">Center Here</button>
+      </div>
+      <div class="destination">
+        <input type="text" class="address" id="loc2" value="c" placeholder="address" size="48">
+        <button class="center">Center Here</button>
+      </div>
+      <div class="destination">
+        <input type="text" class="address" id="loc3" value="d" placeholder="address" size="48">
+        <button class="center">Center Here</button>
+      </div>
+
+      <button id="findOptimal">Find Optimal Route</button>
     </div>
     <div id="map"></div>
 
     <script src="js/vendor/jquery/dist/jquery.min.js"></script>
     <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkiQd6LbsShOKAG8vrR-YMF9dn3BQE9oE">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkiQd6LbsShOKAG8vrR-YMF9dn3BQE9oE&callback=initMap">
     </script>
     <script type="text/javascript" src="js/main.js"></script>
   </body>
