@@ -5,7 +5,7 @@ $(document).ready(function() {
   console.log('jQuery working')
   
   var geocodeUrl = 'https://maps.googleapis.com/maps/api/geocode/json?';
-  var apiKey = 'AIzaSyBNRDTGtLXHjQHOGmXviTCtmLSw2Qn6SPU';
+  var apiKey = 'AIzaSyAkiQd6LbsShOKAG8vrR-YMF9dn3BQE9oE';
 
   $('#go').click(centerOnAddress);
   $('#address').on('keypress', function(e) {
