@@ -1,0 +1,21 @@
+{
+  "name": "maps-test",
+  "homepage": "https://github.com/babelthuap/google-api-fun",
+  "authors": [
+    "Nicholas Neumann-Chun <nicholas.babelthuap (at) gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4"
+  }
+}

@@ -17,7 +17,9 @@ $(document).ready(function() {
         if (data.results.length === 0) return; // if it found no matches
         var location = data.results[0].geometry.location;
         map = new google.maps.Map(document.getElementById('map'), {
-          center: location, zoom: 10
+          center: location,
+          zoom: 12,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
         });
       })
       .fail(function(err) {
