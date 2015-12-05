@@ -137,7 +137,7 @@ $(document).ready(function() {
 
         $('#findOptimal').prop('disabled', false);
       }
-    }, 250);
+    }, 500);
 
   }
 
@@ -196,9 +196,10 @@ $(document).ready(function() {
         var time = data.routes[0].legs[0].duration.value;
         travelTimes[loc1 + '->' + loc2] = time;
       } else if (status === 'OVER_QUERY_LIMIT' && !BAD_QUERY) {
+        console.log('hit query limit -- trying again');
         setTimeout(function() {
           calcTimeBetween(loc1, loc2);
-        }, 250 + Math.floor(Math.random() * 750)); // wait 250+ ms before trying again
+        }, 2000 + Math.floor(Math.random() * 1000)); // wait 2-3s before trying again
       } else {
         BAD_QUERY = true;
       }
