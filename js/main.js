@@ -199,7 +199,7 @@ $(document).ready(function() {
         console.log('hit query limit -- trying again');
         setTimeout(function() {
           calcTimeBetween(loc1, loc2);
-        }, 2000 + Math.floor(Math.random() * 1000)); // wait 2-3s before trying again
+        }, 2000 + Math.floor(Math.random() * 4000)); // wait 2-6s before trying again
       } else {
         BAD_QUERY = true;
       }
